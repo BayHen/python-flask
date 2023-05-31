@@ -1,6 +1,6 @@
 from flask import Flask, render_template, url_for, request, flash, redirect, session
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, PasswordField
+from wtforms import StringField, TextAreaField, PasswordField
 from wtforms.validators import DataRequired
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import ForeignKey
@@ -14,7 +14,7 @@ app = Flask(__name__)
 # Add Database
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///project_test.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATUONS"] = False
-app.permanent_session_lifetime = timedelta(minutes=1)
+app.permanent_session_lifetime = timedelta(minutes=5)
 db = SQLAlchemy(app)
 app.app_context().push()
 
@@ -52,17 +52,18 @@ class Post(UserMixin,db.Model):
     content = db.Column(db.String(100), nullable=False, unique = True)
     date_create = db.Column(db.Date(), default=datetime.utcnow)
 
-    def __init__(self, blog_name=None, content=None, user_id=None, date_create=None):
+    def __init__(self, user_id=None, blog_name=None, content=None, date_create=None):
+        self.user_id = user_id
         self.blog_name = blog_name
         self.content = content
-        self.user_id = user_id
         self.date_create = date_create
 
 # Create a From Class
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    posts = Post.query.all()
+    return render_template("index.html", posts=posts)
 
 # Create Sign In Form
 class SignInForm(FlaskForm):
@@ -92,7 +93,6 @@ class SignUpForm(FlaskForm):
     password_confirm = PasswordField('Enter Password Confirm!!!', validators=[DataRequired()])
 
 @app.route('/user/regist', methods=['GET' ,'POST'])
-@login_required
 def sign_up():
     form = SignUpForm()
     if not current_user.is_authenticated:
@@ -116,6 +116,39 @@ def sign_up():
     else:
         return redirect(url_for('index'))
     return render_template('user/regist.html', form=form)
+
+#Create a new Post
+class CreatePostForm(FlaskForm):
+    blog_name = StringField('Enter your Name!!!', validators=[DataRequired()])
+    content = TextAreaField('Enter your email address!!!', validators=[DataRequired()])
+
+@app.route('/post/create', methods=['GET', 'POST'])
+@login_required
+def create_post():
+    if current_user.is_authenticated:
+        form = CreatePostForm()
+        if request.method == 'POST':
+            post = Post(current_user.id, form.blog_name.data, form.content.data)
+            db.session.add(post)
+            db.session.commit()
+            flash("Bạn đã đăng ký thành công!!!!", "info")
+            return redirect(url_for('index'))
+    return render_template('post/create.html', form=form)
+
+#Show Post
+@app.route('/user/posts')
+@login_required
+def show_post():
+    if current_user.is_authenticated:
+        posts = Post.query.filter_by(user_id=current_user.id)
+    return render_template('user/posts.html', posts=posts)
+
+#Create Logout function
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for("index"))
 
 # Invalid URL
 @app.errorhandler(404)

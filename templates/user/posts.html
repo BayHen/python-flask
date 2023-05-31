@@ -1,14 +1,16 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="row row-cols-3">
-    {% for post in posts%}
-        <div class="col-6 col-md-4">
+    <div class="grid text-center">
+        {% for post in posts%}
+        <div class="g-col-6 g-col-md-4">
             <div class="wrap-login100">
                 <span>{{post.blog_name}}</span>
                 <br>
                 <span>{{post.content}}</span>
             </div>
         </div>
-    {% endfor %}
+        {% endfor %}
+    </div>
 </div>
 {% endblock content%}

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="limiter">
+    <div class="container-login100">
+        <div class="wrap-login100">
+            <form class="login100-form validate-form" action="{{ url_for('create_post') }}" method="post">
+                <span class="login100-form-title mb-30">
+                    Create Post
+                </span>
+                <div class="wrap-input100 validate-input">
+                    <label for="exampleFormControlInput1" class="form-label">Post Name</label>
+                    {{ form.blog_name(class="form-control",id="exampleFormControlInput1", placeholder="Post Name") }}
+                </div>
+                <div class="wrap-input100 validate-input">
+                    <label for="exampleFormControlTextarea1" class="form-label">Example textarea</label>
+                    {{ form.content(class="form-control",id="exampleFormControlInput1",rows="3") }}
+                </div>
+                <div class="container-login100-form-btn">
+                    <div class="wrap-login100-form-btn">
+                        <div class="login100-form-bgbtn"></div>
+                        <button class="login100-form-btn">
+                            Add Post
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}

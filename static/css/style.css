@@ -5,9 +5,26 @@
     color: #fff;
 }
 .btn-s{
+    position: relative;
     background-color: #fff;
-    width: 50%;
+    width: 5%;
     height: 40px;
+    border-radius: 5px;
+}
+.btn-s a{
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 90px;
+    height: 40px;
+    padding-top: 8px;
+    text-decoration: none;
+}
+.btn-s a:hover {
+    color: #fff;
+}
+.form-create-post{
+    border: 1px solid #000;
     border-radius: 5px;
 }
 @font-face {
@@ -485,4 +502,7 @@ iframe {
         visibility:visible;
         opacity: 1
     }
+}
+.focus-input100{
+    text-align: left;
 }
