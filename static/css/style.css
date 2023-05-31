@@ -20,12 +20,16 @@
     padding-top: 8px;
     text-decoration: none;
 }
-.btn-s a:hover {
+.btn-s a:hover, a.login100-form-btn:hover {
     color: #fff;
 }
 .form-create-post{
     border: 1px solid #000;
     border-radius: 5px;
+}
+a.login100-form-btn{
+    text-decoration: none;
+    color: #fff;
 }
 @font-face {
     font-family: Poppins-Regular;

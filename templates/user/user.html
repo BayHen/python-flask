@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="limiter">
+    <div class="container-login100">
+        <div class="wrap-login100">
+            <span class="login100-form-title mb-30">
+                Create Post
+            </span>
+            <div class="wrap-input100 validate-input">
+                <label for="exampleFormControlInput1" class="form-label">User Name</label>
+                <p>{{user.name}}</p>
+            </div>
+            <div class="wrap-input100 validate-input">
+                <label for="exampleFormControlTextarea1" class="form-label">User Email</label>
+                <p>{{user.email}}</p>
+            </div>
+            <div class="container-login100-form-btn">
+                <div class="wrap-login100-form-btn">
+                    <div class="login100-form-bgbtn"></div>
+                    <a class="login100-form-btn" href="{{ url_for('edit_user') }}" role="button">Update</a>  
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

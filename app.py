@@ -117,7 +117,7 @@ def sign_up():
         return redirect(url_for('index'))
     return render_template('user/regist.html', form=form)
 
-#Create a new Post
+#Create a new Post Form
 class CreatePostForm(FlaskForm):
     blog_name = StringField('Enter your Name!!!', validators=[DataRequired()])
     content = TextAreaField('Enter your email address!!!', validators=[DataRequired()])
@@ -149,6 +149,41 @@ def show_post():
 def logout():
     logout_user()
     return redirect(url_for("index"))
+
+#Edit User Profile 
+@app.route('/user/edit', methods=['GET', 'POST'])
+@login_required
+def edit_user():
+    form = SignUpForm()
+    if current_user.is_authenticated:
+        user_profile = User.query.filter_by(id=current_user.id)
+        if request.method == 'POST':
+            if form.validate_on_submit():
+                user = User.query.filter_by(email=form.email.data).first()
+                session.permanent = True
+                if user is None:
+                    if form.password.data == form.password_confirm.data:
+                            user = User(form.name.data, form.email.data, generate_password_hash(form.password.data))
+                            db.session.add(user)
+                            db.session.commit()
+                            flash("Bạn đã cập nhật thành công!!!!", "info")
+                            return redirect(url_for("user"))
+                    else:
+                        flash("Password đang không trùng khớp!!!!", "info")
+                        return redirect(url_for('edit_user'))
+                else:
+                    flash('Email address already exists')
+                    return redirect(url_for('edit_user'))
+    else:
+        return redirect(url_for('index'))
+    return render_template('user/edit.html', form=form, user_profile=user_profile)
+            
+@app.route('/user/user')
+@login_required
+def user():
+    if current_user.is_authenticated:
+        user = User.query.filter_by(id=current_user.id).first()
+    return render_template('user/user.html', user=user)
 
 # Invalid URL
 @app.errorhandler(404)
