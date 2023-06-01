@@ -50,12 +50,26 @@ class Post(UserMixin,db.Model):
     user_id = db.Column(db.Integer, ForeignKey('user.id'))
     blog_name = db.Column(db.String(255), nullable=False, )
     content = db.Column(db.String(100), nullable=False, unique = True)
+    comment = db.relationship('Comment', backref='post')
     date_create = db.Column(db.Date(), default=datetime.utcnow)
 
     def __init__(self, user_id=None, blog_name=None, content=None, date_create=None):
         self.user_id = user_id
         self.blog_name = blog_name
         self.content = content
+        self.date_create = date_create
+
+class Comment(UserMixin,db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, ForeignKey('user.id'))
+    post_id = db.Column(db.Integer, ForeignKey('post.id'))
+    comment_body = db.Column(db.String(1000), nullable=False, unique = True)
+    date_create = db.Column(db.Date(), default=datetime.utcnow)
+
+    def __init__(self, user_id=None, post_id=None, comment_body=None, date_create=None):
+        self.user_id = user_id
+        self.post_id = post_id
+        self.comment_body = comment_body
         self.date_create = date_create
 
 # Create a From Class
@@ -121,6 +135,49 @@ def sign_up():
         return redirect(url_for('index'))
     return render_template('user/regist.html', form=form)
 
+#Create Logout function
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for("index"))
+            
+@app.route('/user/user')
+@login_required
+def user():
+    if current_user.is_authenticated:
+        user = User.query.filter_by(id=current_user.id).first()
+    return render_template('user/user.html', user=user)
+
+#Edit User Profile 
+@app.route('/user/edit', methods=['GET', 'POST'])
+@login_required
+def edit_user():
+    if current_user.is_authenticated:
+        user_profile = User.query.filter_by(id=current_user.id).first()
+        if request.method == 'POST':
+                user_name = request.form['name']
+                email = request.form['email']
+                password_old = request.form['password_old']
+                password_new = request.form['password_new']
+                password_new_confirm = request.form['password_new_confirm']
+                session.permanent = True
+                if check_password_hash(user_profile.password, password_old):
+                    if password_new == password_new_confirm:
+                        user_profile.name = user_name
+                        user_profile.email = email
+                        user_profile.password = generate_password_hash(password_new)
+                        db.session.commit()
+                        flash("Bạn đã cập nhật thành công!!!!", "info")
+                        return redirect(url_for("user"))
+                    else:
+                        flash("Password đang không trùng khớp!!!!", "info")
+                        return redirect(url_for('edit_user'))
+                else:
+                    flash("Mật khẩu cũ không đúng!!!!", "info")
+                    return redirect(url_for("edit_user"))
+    return render_template('user/edit.html', user_profile=user_profile)
+
 #Create a new Post Form
 class CreatePostForm(FlaskForm):
     blog_name = StringField('Enter your Name!!!', validators=[DataRequired()])
@@ -162,44 +219,9 @@ def show_post():
         posts = Post.query.filter_by(user_id=current_user.id)
     return render_template('user/posts.html', posts=posts)
 
-#Create Logout function
-@app.route('/logout')
-@login_required
-def logout():
-    logout_user()
-    return redirect(url_for("index"))
-
-#Edit User Profile 
-@app.route('/user/edit', methods=['GET', 'POST'])
-@login_required
-def edit_user():
-    if current_user.is_authenticated:
-        user_profile = User.query.filter_by(id=current_user.id).first()
-        if request.method == 'POST':
-                user_name = request.form['name']
-                email = request.form['email']
-                password_old = request.form['password_old']
-                password_new = request.form['password_new']
-                password_new_confirm = request.form['password_new_confirm']
-                session.permanent = True
-                if check_password_hash(user_profile.password, password_old):
-                    if password_new == password_new_confirm:
-                        user_profile.name = user_name
-                        user_profile.email = email
-                        user_profile.password = generate_password_hash(password_new)
-                        db.session.commit()
-                        flash("Bạn đã cập nhật thành công!!!!", "info")
-                        return redirect(url_for("user"))
-                    else:
-                        flash("Password đang không trùng khớp!!!!", "info")
-                        return redirect(url_for('edit_user'))
-                else:
-                    flash("Mật khẩu cũ không đúng!!!!", "info")
-                    return redirect(url_for("edit_user"))
-    return render_template('user/edit.html', user_profile=user_profile)
-
 #Delete Post 
 @app.route('/delete/<int:id>', methods=['GET', 'POST'])
+@login_required
 def delete(id):
     if current_user.is_authenticated:
         post = Post.query.get_or_404(id)
@@ -207,13 +229,28 @@ def delete(id):
         db.session.commit()
         flash("Bạn đã xóa bài post thành công!!!!", "info")
         return redirect(url_for('show_post'))
-            
-@app.route('/user/user')
-@login_required
-def user():
+
+#Create a Comment Form
+class CreateCommentForm(FlaskForm):
+    comment = StringField('Comment......', validators=[DataRequired()])
+
+#Post Details
+@app.route('/post/post_detail/<int:id>', methods=['GET', 'POST'])
+def post_detail(id):
+    comments = Comment.query.filter_by(post_id=id)
+    post_detail = Post.query.get_or_404(id)
+    form = CreateCommentForm()
     if current_user.is_authenticated:
-        user = User.query.filter_by(id=current_user.id).first()
-    return render_template('user/user.html', user=user)
+        post = Post.query.filter_by(user_id=current_user.id).first()
+        if post is None:
+            try:
+                comment = Comment(current_user.id, post.id, form.comment.data)
+                db.session.add(comment)
+                db.session.commit()
+                return redirect(url_for('post_detail', id=post.id))
+            except:
+                flash('Lỗi')
+    return render_template('post/post_detail.html',form=form , comments=comments, post_detail=post_detail)
 
 # Invalid URL
 @app.errorhandler(404)

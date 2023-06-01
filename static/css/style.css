@@ -513,6 +513,40 @@ iframe {
     border-radius: 10px;
     overflow: hidden;
     padding: 30px 55px 33px;
+    text-align: center;
+    box-shadow: 0 5px 10px 0 rgba(0,0,0,.1);
+    -moz-box-shadow: 0 5px 10px 0 rgba(0,0,0,.1);
+    -webkit-box-shadow: 0 5px 10px 0 rgba(0,0,0,.1);
+    -o-box-shadow: 0 5px 10px 0 rgba(0,0,0,.1);
+    -ms-box-shadow: 0 5px 10px 0 rgba(0,0,0,.1)
+}
+.wrap-post-detail {
+    width: 600px;
+    height: auto;
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    padding: 30px 55px 33px;
+    box-shadow: 0 5px 10px 0 rgba(0,0,0,.1);
+    -moz-box-shadow: 0 5px 10px 0 rgba(0,0,0,.1);
+    -webkit-box-shadow: 0 5px 10px 0 rgba(0,0,0,.1);
+    -o-box-shadow: 0 5px 10px 0 rgba(0,0,0,.1);
+    -ms-box-shadow: 0 5px 10px 0 rgba(0,0,0,.1)
+}
+.btn.form-label-comment{
+    margin-left: 374px;
+}
+.post-name{
+    text-decoration: none;
+    color: #000;
+}
+.comment-item{
+    width: 400px;
+    height: auto;
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    padding: 30px 55px 33px;
     box-shadow: 0 5px 10px 0 rgba(0,0,0,.1);
     -moz-box-shadow: 0 5px 10px 0 rgba(0,0,0,.1);
     -webkit-box-shadow: 0 5px 10px 0 rgba(0,0,0,.1);

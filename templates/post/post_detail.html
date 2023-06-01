@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="limiter">
+    <div class="container-login100">
+        <div class="wrap-post-detail">
+            <div class="post-item-detail">
+                <span class="login100-form-title mb-30">
+                    Post Detail
+                </span>
+                {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        {{ messages[0] }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endif %}
+                {% endwith %}
+                <h5>{{post_detail.blog_name}}</h5>
+                <span>{{post_detail.content}}</span>
+                <div class="comment-of-post">
+                    {%  for comment in comments%}
+                        <div class="comment-item">
+                            <p>{{comment.comment}}</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% if current_user.is_authenticated %}
+                <div class="form-comment">
+                        {% include 'comment/comment.html' %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock content %}

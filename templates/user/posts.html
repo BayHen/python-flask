@@ -12,7 +12,7 @@
     {% for post in posts%}
     <div class="col-6 col-md-4">
         <div class="wrap-post100">
-            <h5>{{post.blog_name}}</h5>
+            <a href="{{url_for('post_detail', id=post.id)}}" class="post-name"><h4>{{post.blog_name}}</h4></a>
             <span>{{post.content}}</span>
             <br>
             <a class="btn" href="/post/edit/{{post.id}}">

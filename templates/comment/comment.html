@@ -1,0 +1,10 @@
+<form action="{{ url_for('post_detail', id=post_detail.id) }}" method="post">
+    <div class="validate-input">
+        <span class="form-label-comment">Comment:</span>
+        {{ form.comment(class="form-control", placeholder="Comment........") }}
+    </div>
+    <button class="btn form-label-comment">
+        Comment
+        <i class="fa-regular fa-comment" style="color: #1f5125;"></i>
+    </button>
+</form>
