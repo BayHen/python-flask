@@ -3,7 +3,7 @@
 <div class="limiter">
     <div class="container-login100">
         <div class="wrap-login100">
-            <form class="login100-form validate-form" action="/user/regist" method="post">
+            <form class="login100-form validate-form" action="/user/edit" method="post">
                 <span class="login100-form-title mb-30">
                     Update User
                 </span>
@@ -16,26 +16,33 @@
                 {% endif %}
                 {% endwith %}
                     <div class="wrap-input100 validate-input">
-                        {{ form.name(class="input100") }}
+                        <input class="input100" type="text" name="name" value="{{user_profile.name}}">
                         <span class="focus-input100" data-placeholder="Name"></span>
                     </div>
                     <div class="wrap-input100 validate-input">
-                        {{ form.email(class="input100") }}
-                        <span class="focus-input100" data-placeholder="Email"></span>
+                        <input class="input100" type="email" name="email" value="{{user_profile.email}}">
+                        <span class="focus-input100" data-placeholder="Email"></span> 
                     </div>
-                    <div class="wrap-input100 validate-input" data-validate="Enter password">
+                    <div class="wrap-input100 validate-input" data-validate="Enter password old">
                         <span class="btn-show-pass">
                             <i class="zmdi zmdi-eye"></i>
                         </span>
-                        {{ form.password(class="input100") }}
-                        <span class="focus-input100" data-placeholder="Password"></span>
+                        <input  class="input100 password-old" type="password" name="password_old" value="">
+                        <span class="focus-input100" data-placeholder="Password Old"></span>
                     </div>
-                    <div class="wrap-input100 validate-input" data-validate="Enter Password Confirm">
+                    <div class="wrap-input100 validate-input" data-validate="Enter password new">
                         <span class="btn-show-pass">
                             <i class="zmdi zmdi-eye"></i>
                         </span>
-                        {{ form.password_confirm(class="input100") }}
-                        <span class="focus-input100" data-placeholder="Password Confirm"></span>
+                        <input  class="input100 password-new" type="password" name="password_new" >
+                        <span class="focus-input100" data-placeholder="Password New"></span>
+                    </div>
+                    <div class="wrap-input100 validate-input" data-validate="Enter password new confirm">
+                        <span class="btn-show-pass">
+                            <i class="zmdi zmdi-eye"></i>
+                        </span>
+                        <input  class="input100 password-new-confirm" type="password" name="password_new_confirm" >
+                        <span class="focus-input100" data-placeholder="Password New Confirm"></span>
                     </div>
                     <div class="container-login100-form-btn">
                         <div class="wrap-login100-form-btn">
@@ -45,7 +52,6 @@
                             </button>
                         </div>
                     </div>
-                    {{ form.hidden_tag() }}
                 </form>
             </div>
         </div>

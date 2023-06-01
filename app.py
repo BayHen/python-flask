@@ -135,6 +135,21 @@ def create_post():
             return redirect(url_for('index'))
     return render_template('post/create.html', form=form)
 
+#Edit a Post
+@app.route('/post/edit/<int:id>', methods=['GET', 'POST'])
+@login_required
+def edit_post(id):
+    if current_user.is_authenticated:
+        post = Post.query.get_or_404(id)
+        form = CreatePostForm()
+        if request.method == 'POST':
+            post.blog_name = form.blog_name.data
+            post.content = request.form['content']
+            db.session.commit()
+            flash("Bạn đã cập nhật thành công!!!!", "info")
+            return redirect(url_for('index'))
+    return render_template('post/edit.html', form=form, post=post)
+
 #Show Post
 @app.route('/user/posts')
 @login_required
@@ -154,29 +169,30 @@ def logout():
 @app.route('/user/edit', methods=['GET', 'POST'])
 @login_required
 def edit_user():
-    form = SignUpForm()
     if current_user.is_authenticated:
-        user_profile = User.query.filter_by(id=current_user.id)
+        user_profile = User.query.filter_by(id=current_user.id).first()
         if request.method == 'POST':
-            if form.validate_on_submit():
-                user = User.query.filter_by(email=form.email.data).first()
+                user_name = request.form['name']
+                email = request.form['email']
+                password_old = request.form['password_old']
+                password_new = request.form['password_new']
+                password_new_confirm = request.form['password_new_confirm']
                 session.permanent = True
-                if user is None:
-                    if form.password.data == form.password_confirm.data:
-                            user = User(form.name.data, form.email.data, generate_password_hash(form.password.data))
-                            db.session.add(user)
-                            db.session.commit()
-                            flash("Bạn đã cập nhật thành công!!!!", "info")
-                            return redirect(url_for("user"))
+                if check_password_hash(user_profile.password, password_old):
+                    if password_new == password_new_confirm:
+                        user_profile.name = user_name
+                        user_profile.email = email
+                        user_profile.password = generate_password_hash(password_new)
+                        db.session.commit()
+                        flash("Bạn đã cập nhật thành công!!!!", "info")
+                        return redirect(url_for("user"))
                     else:
                         flash("Password đang không trùng khớp!!!!", "info")
                         return redirect(url_for('edit_user'))
                 else:
-                    flash('Email address already exists')
-                    return redirect(url_for('edit_user'))
-    else:
-        return redirect(url_for('index'))
-    return render_template('user/edit.html', form=form, user_profile=user_profile)
+                    flash("Mật khẩu cũ không đúng!!!!", "info")
+                    return redirect(url_for("edit_user"))
+    return render_template('user/edit.html', user_profile=user_profile)
             
 @app.route('/user/user')
 @login_required
