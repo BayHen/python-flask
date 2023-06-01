@@ -82,7 +82,11 @@ def login():
                 flash('Please check your login details and try again.')
                 return redirect(url_for('login'))
             login_user(user)
-            return redirect(url_for('index'))
+            print(request.args.get('next'))
+            if request.args.get('next') != None:
+                return redirect(request.args.get('next'))
+            else:
+                return redirect(url_for('index'))
     return render_template('auth/login.html', form=form)
     
 # Create Sign Up Form
@@ -193,6 +197,16 @@ def edit_user():
                     flash("Mật khẩu cũ không đúng!!!!", "info")
                     return redirect(url_for("edit_user"))
     return render_template('user/edit.html', user_profile=user_profile)
+
+#Delete Post 
+@app.route('/delete/<int:id>', methods=['GET', 'POST'])
+def delete(id):
+    if current_user.is_authenticated:
+        post = Post.query.get_or_404(id)
+        db.session.delete(post)
+        db.session.commit()
+        flash("Bạn đã xóa bài post thành công!!!!", "info")
+        return redirect(url_for('show_post'))
             
 @app.route('/user/user')
 @login_required

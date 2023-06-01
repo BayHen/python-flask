@@ -1,16 +1,42 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="row row-cols-3">
-    <div class="grid text-center">
-        {% for post in posts%}
-        <div class="g-col-6 g-col-md-4">
-            <div class="wrap-login100">
-                <span>{{post.blog_name}}</span>
-                <br>
-                <span>{{post.content}}</span>
-            </div>
-        </div>
-        {% endfor %}
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        {{ messages[0] }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
+{% endif %}
+{% endwith %}
+<div class="row row-cols-3">
+    {% for post in posts%}
+    <div class="col-6 col-md-4">
+        <div class="wrap-post100">
+            <h5>{{post.blog_name}}</h5>
+            <span>{{post.content}}</span>
+            <br>
+            <a class="btn" href="/post/edit/{{post.id}}">
+                <button>
+                    Edit Post
+                    <i class="fa-solid fa-pen-to-square" style="color: #1f5125;"></i>
+                </button>
+            </a>
+            <a class="btn" href="/delete/{{post.id}}">
+                <button>
+                    Delete
+                    <i class="fa-solid fa-trash" style="color: #1f5125;"></i>
+                </button>
+            </a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+<div class="btn">
+    <a class="btn-center" href="{{ url_for('create_post') }}">
+        <button>
+            Add Post
+            <i class="fa-solid fa-plus" style="color: #1f5125;"></i>
+        </button>
+    </a>
 </div>
 {% endblock content%}
