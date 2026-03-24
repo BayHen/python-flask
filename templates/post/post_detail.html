@@ -17,12 +17,18 @@
                 {% endwith %}
                 <h5>{{post_detail.blog_name}}</h5>
                 <span>{{post_detail.content}}</span>
+                <br>
+                <span class="form-label-comment">Comment:</span>
                 <div class="comment-of-post">
                     {%  for comment in comments%}
+                    <form action="{{ url_for('deleteComment', id=comment.id) }}" method="post">
                         <div class="comment-item">
-                            <p>{{comment.comment}}</p>
+                            <span>{{comment.comment_body}}</span>
                         </div>
+                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                    </form>
                     {% endfor %}
+                <br>
                 </div>
             </div>
             {% if current_user.is_authenticated %}

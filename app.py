@@ -29,7 +29,7 @@ login_manager.init_app(app)
 @login_manager.user_loader
 def load_user(id):
         # since the user_id is just the primary key of our user table, use it in the query for the user
-        return User.query.get(int(id))
+        return db.session.get(User, id)
 
 class User(UserMixin,db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -63,7 +63,7 @@ class Comment(UserMixin,db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, ForeignKey('user.id'))
     post_id = db.Column(db.Integer, ForeignKey('post.id'))
-    comment_body = db.Column(db.String(1000), nullable=False, unique = True)
+    comment_body = db.Column(db.String(1000), nullable=False)
     date_create = db.Column(db.Date(), default=datetime.utcnow)
 
     def __init__(self, user_id=None, post_id=None, comment_body=None, date_create=None):
@@ -242,15 +242,40 @@ def post_detail(id):
     form = CreateCommentForm()
     if current_user.is_authenticated:
         post = Post.query.filter_by(user_id=current_user.id).first()
-        if post is None:
-            try:
-                comment = Comment(current_user.id, post.id, form.comment.data)
-                db.session.add(comment)
-                db.session.commit()
-                return redirect(url_for('post_detail', id=post.id))
-            except:
-                flash('Lỗi')
+        if post is not None:
+            if request.method == 'POST':
+                try:
+                    comment = Comment(current_user.id, id, form.comment.data)
+                    db.session.add(comment)
+                    db.session.commit()
+                    return redirect(url_for('post_detail', id=id))
+                except Exception as e:
+                    db.session.rollback()
+                    print("Transaction failed:", e)
+                    flash('Lỗi')
     return render_template('post/post_detail.html',form=form , comments=comments, post_detail=post_detail)
+
+#Delete Comment 
+@app.route('/delete/comment/<int:id>', methods=['GET', 'POST'])
+@login_required
+def deleteComment(id):
+    if current_user.is_authenticated:
+        user = User.query.filter_by(id=current_user.id).first()
+        comment = Comment.query.get_or_404(id)
+        if comment.user_id != user.id:
+            flash("Bạn không có quyền xóa bình luận này!!!!", "info")
+            return redirect(url_for('post_detail', id=comment.post_id))
+        else:
+            try:
+                db.session.delete(comment)
+                db.session.commit()
+                flash("Bạn đã xóa bình luận thành công!!!!", "info")
+                return redirect(url_for('post_detail', id=comment.post_id))
+            except Exception as e:
+                db.session.rollback()
+                print("Transaction failed:", e)
+                flash('Lỗi')
+        return redirect(url_for('post_detail', id=comment.post_id))
 
 # Invalid URL
 @app.errorhandler(404)
